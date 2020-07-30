@@ -20,9 +20,5 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-
-        placeViewModel.placeData.observe(this, Observer {
-
-        })
     }
 }
