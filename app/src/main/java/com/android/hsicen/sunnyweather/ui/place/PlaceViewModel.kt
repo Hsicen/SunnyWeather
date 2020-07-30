@@ -22,4 +22,5 @@ class PlaceViewModel : ViewModel() {
         _searchStr.value = query
     }
 
+
 }
