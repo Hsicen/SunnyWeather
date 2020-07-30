@@ -16,6 +16,7 @@ import kotlin.coroutines.suspendCoroutine
 object Net {
     private val placeService = ServiceCreator.create(PlaceService::class.java)
 
+    //发起网络请求
     suspend fun searchPlace(query: String) = placeService.searchPlace(query).await()
 
     private suspend fun <T> Call<T>.await(): T {
