@@ -1,8 +1,6 @@
 package com.android.hsicen.sunnyweather.ui.place
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.hsicen.sunnyweather.MainActivity
 import com.android.hsicen.sunnyweather.R
+import com.android.hsicen.sunnyweather.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.layout_fragment_place.*
 
 /**
@@ -21,17 +21,17 @@ import kotlinx.android.synthetic.main.layout_fragment_place.*
  * 作用：
  * 描述：SunnyWeather
  */
-class PlaceFragment: Fragment(){
-    val mViewModel by lazy {
+class PlaceFragment : Fragment() {
+    private val mViewModel by lazy {
         ViewModelProvider(this)[PlaceViewModel::class.java]
     }
 
-    val mAdapter by lazy {
+    private val mAdapter by lazy {
         PlaceAdapter(this, mViewModel.placeList)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.layout_fragment_place, container, false)
     }
@@ -39,37 +39,34 @@ class PlaceFragment: Fragment(){
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        if (activity is MainActivity && mViewModel.isPlaceSaved()) {
+            val place = mViewModel.getSavePlace()
+            //WeatherActivity.start(requireActivity())
+        }
+
+
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = mAdapter
 
-        searchPlaceEdit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                val content = p0?.toString()?:""
+        searchPlaceEdit.addTextChangedListener { editable ->
+            val content = editable?.toString() ?: ""
 
-                if (content.isNotEmpty()){
-                    mViewModel.searchPlace(content)
-                }else{
-                    recyclerView.visibility = View.GONE
-                    bgImageView.visibility = View.VISIBLE
-                    mViewModel.placeList.clear()
-                    mAdapter.notifyDataSetChanged()
-                }
+            if (content.isNotEmpty()) {
+                mViewModel.searchPlace(content)
+            } else {
+                recyclerView.visibility = View.GONE
+                bgImageView.visibility = View.VISIBLE
+                mViewModel.placeList.clear()
+                mAdapter.notifyDataSetChanged()
             }
+        }
 
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-        })
-
-
-        mViewModel.placeData.observe(viewLifecycleOwner, Observer {result ->
+        mViewModel.placeData.observe(viewLifecycleOwner, Observer { result ->
             val places = result.getOrNull()
-            if (places.isNullOrEmpty()){
+            if (places.isNullOrEmpty()) {
                 result.exceptionOrNull()?.printStackTrace()
-                Toast.makeText(activity, "未能查询到任何数据",Toast.LENGTH_SHORT).show()
-            }else{
+                Toast.makeText(activity, "未能查询到任何地点", Toast.LENGTH_SHORT).show()
+            } else {
                 recyclerView.visibility = View.VISIBLE
                 bgImageView.visibility = View.GONE
                 mViewModel.placeList.clear()
