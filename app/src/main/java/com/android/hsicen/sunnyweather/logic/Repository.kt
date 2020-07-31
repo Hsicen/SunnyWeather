@@ -1,6 +1,8 @@
 package com.android.hsicen.sunnyweather.logic
 
 import androidx.lifecycle.liveData
+import com.android.hsicen.sunnyweather.logic.dao.PlaceDao
+import com.android.hsicen.sunnyweather.logic.model.Place
 import com.android.hsicen.sunnyweather.logic.model.Weather
 import com.android.hsicen.sunnyweather.logic.network.Net
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,12 @@ object Repository {
             }
         }
     }
+
+    fun savePlace(place: Place) = PlaceDao.savePlace(place)
+
+    fun getSavePlace() = PlaceDao.getPlace()
+
+    fun isPlaceSaved() = PlaceDao.isPlaceSaved()
 
     //统一Try-catch处理
     private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
