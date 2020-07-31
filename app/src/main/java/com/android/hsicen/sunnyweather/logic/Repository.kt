@@ -1,8 +1,11 @@
 package com.android.hsicen.sunnyweather.logic
 
 import androidx.lifecycle.liveData
+import com.android.hsicen.sunnyweather.logic.model.Weather
 import com.android.hsicen.sunnyweather.logic.network.Net
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -24,9 +27,27 @@ object Repository {
         }
     }
 
+    //异步请求，同步回调
+    fun refreshWeather(lng: String, lat: String, placeName: String) = fire(Dispatchers.IO) {
+        coroutineScope {
+            val realTime = async { Net.getRealTimeWeather(lng, lat) }
+            val daily = async { Net.getDailyWeather(lng, lat) }
+
+            val realResponse = realTime.await()
+            val dailyResponse = daily.await()
+
+            if (realResponse.status == "ok" && dailyResponse.status == "ok") {
+                val weather = Weather(realResponse.result.realTime, dailyResponse.result.daily)
+                Result.success(weather)
+            } else {
+                Result.failure(RuntimeException("real: ${realResponse.status}; daily: ${dailyResponse.status}"))
+            }
+        }
+    }
+
     //统一Try-catch处理
     private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
-        liveData<Result<T>>(context) {
+        liveData(context) {
             val result = try {
                 block()
             } catch (e: Exception) {

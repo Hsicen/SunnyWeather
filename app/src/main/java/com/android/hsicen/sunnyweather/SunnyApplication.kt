@@ -22,6 +22,5 @@ class SunnyApplication : Application() {
 
         //提供全局Context
         lateinit var ctx: Context
-
     }
 }

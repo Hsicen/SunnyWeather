@@ -1,4 +1,4 @@
-package com.android.hsicen.sunnyweather.logic.network
+package com.android.hsicen.sunnyweather.logic.network.service
 
 import com.android.hsicen.sunnyweather.SunnyApplication
 import com.android.hsicen.sunnyweather.logic.model.PlaceResponse
@@ -15,6 +15,6 @@ import retrofit2.http.Query
 
 interface PlaceService {
 
-    @GET("/v2.5/place?token=${SunnyApplication.TOKEN}&lang=zh_CN")
+    @GET("v2/place?token=${SunnyApplication.TOKEN}&lang=zh_CN")
     fun searchPlace(@Query("query") query: String): Call<PlaceResponse>
 }
